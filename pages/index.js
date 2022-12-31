@@ -111,14 +111,10 @@ export async function getStaticProps(_context) {
 
 async function getSpreadsheet() {
   const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID);
-  const googlePrivateKey = process.env.GOOGLE_PRIVATE_KEY;
 
   await doc.useServiceAccountAuth({
     client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    private_key:
-      process.env.NODE_ENV === 'production'
-        ? JSON.parse(googlePrivateKey)['googlePrivateKey']
-        : googlePrivateKey,
+    private_key: process.env.GOOGLE_PRIVATE_KEY,
   });
 
   await doc.loadInfo();
