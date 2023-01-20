@@ -29,24 +29,34 @@ ChartJS.register(
 );
 
 const options = {
+  locale: 'es-CL',
   plugins: {
     legend: {
       position: 'top',
     },
     title: {
-      display: false,
+      display: true,
     },
     autocolors: {
-      mode: 'label',
+      mode: 'dataset',
+      offset: 12,
     },
   },
   responsive: true,
   scales: {
     x: {
       stacked: true,
+      title: {
+        display: true,
+        text: 'Región',
+      },
     },
     y: {
       stacked: true,
+      title: {
+        display: true,
+        text: 'Cantidad de personas',
+      },
     },
   },
 };

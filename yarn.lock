@@ -51,6 +51,11 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
+"@kurkle/color@^0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@kurkle/color/-/color-0.3.2.tgz#5acd38242e8bde4f9986e7913c8fdf49d3aa199f"
+  integrity sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw==
+
 "@next/env@13.0.6":
   version "13.0.6"
   resolved "https://registry.yarnpkg.com/@next/env/-/env-13.0.6.tgz#3fcab11ffbe95bff127827d9f7f3139bc5e6adff"
@@ -425,6 +430,11 @@ chart.js@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/chart.js/-/chart.js-4.0.1.tgz#93d5d50ac222a5b3b6ac7488e82e1553ac031592"
   integrity sha512-5/8/9eBivwBZK81mKvmIwTb2Pmw4D/5h1RK9fBWZLLZ8mCJ+kfYNmV9rMrGoa5Hgy2/wVDBMLSUDudul2/9ihA==
+
+chartjs-plugin-autocolors@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/chartjs-plugin-autocolors/-/chartjs-plugin-autocolors-0.2.1.tgz#860f7d6dc5ecd37bcfe55c31bfd1604cd363e791"
+  integrity sha512-xEMmCaFefyqanstu4DBq9OA0BMvYDIUeHroqiGAT9owjekRFdqAp5nSTwjsjCSERFfMEQRnD+VPkaQ2ZgfxexQ==
 
 cheerio-select@^2.1.0:
   version "2.1.0"
