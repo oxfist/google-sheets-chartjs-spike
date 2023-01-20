@@ -49,7 +49,7 @@ const options = {
       stacked: true,
       title: {
         display: true,
-        text: 'Región',
+        text: 'Región de Chile',
       },
     },
     y: {
