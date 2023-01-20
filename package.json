@@ -13,6 +13,7 @@
     "eslint": "^8.29.0",
     "eslint-config-next": "^13.0.6",
     "google-spreadsheet": "^3.3.0",
+    "html-table-to-json": "^1.0.0",
     "next": "^13.0.6",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.0.1",
