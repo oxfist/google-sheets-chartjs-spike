@@ -43,6 +43,7 @@ const options = {
     },
   },
   responsive: true,
+  minBarLength: 3,
   scales: {
     x: {
       stacked: true,
