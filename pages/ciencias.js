@@ -127,8 +127,9 @@ export async function getStaticProps(_context) {
     const htmlTable = await fs.readFile(`public/${file}`, 'utf-8');
     htmlTables.push({ filename: file, htmlContent: htmlTable });
   }
+  console.log(tableFiles);
 
-  const jsonTable = HtmlTableToJson.parse(htmlTables[0].htmlContent);
+  const jsonTable = HtmlTableToJson.parse(htmlTables[2].htmlContent);
 
   const graphData = buildGraphData(jsonTable.results.flat());
 
