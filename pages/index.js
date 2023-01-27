@@ -1,6 +1,8 @@
 import Head from 'next/head';
 
-import { GoogleSpreadsheet } from 'google-spreadsheet';
+import HtmlTableToJson from 'html-table-to-json';
+
+import { promises as fs } from 'fs';
 
 import {
   Chart as ChartJS,
@@ -12,6 +14,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import autocolors from 'chartjs-plugin-autocolors';
 
 import styles from '../styles/Home.module.css';
 
@@ -21,21 +24,30 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  autocolors
 );
 
-const CONFIRMED = 'Confirmado';
-const ABSENT = 'Ausente';
-const LABELS = ['Contacto Personal', 'Propaganda Calle', 'Redes Sociales'];
-
 const options = {
-  responsive: true,
+  locale: 'es-CL',
   plugins: {
     legend: {
       position: 'top',
     },
-    title: {
-      display: true,
+    autocolors: {
+      mode: 'dataset',
+      offset: 12,
+    },
+  },
+  responsive: true,
+  minBarLength: 3,
+  scales: {
+    y: {
+      stacked: true,
+      title: {
+        display: true,
+        text: 'Cantidad de personas',
+      },
     },
   },
 };
@@ -52,74 +64,138 @@ export default function Home({ title, data }) {
       <main className={styles.main}>
         <h1 className={styles.title}>{`${title}`}</h1>
         <div className={styles.graphContainer}>
-          <Bar options={options} data={data} />
+          <Bar
+            options={{
+              ...options,
+              plugins: {
+                title: {
+                  text: 'Trabajadoras y trabajadores por subárea / región',
+                  display: true,
+                },
+              },
+              scales: {
+                x: {
+                  stacked: true,
+                  title: {
+                    display: true,
+                    text: 'Región de Chile',
+                  },
+                },
+              },
+            }}
+            data={data[0]}
+          />
+        </div>
+        <div className={styles.graphContainer}>
+          <Bar
+            options={{
+              ...options,
+              plugins: {
+                title: {
+                  text: 'Trabajadoras y trabajadores por subárea / tipo de contrato',
+                  display: true,
+                },
+              },
+              scales: {
+                x: {
+                  stacked: true,
+                  title: {
+                    display: true,
+                    text: 'Tipo de contrato',
+                  },
+                },
+              },
+            }}
+            data={data[1]}
+          />
         </div>
       </main>
     </div>
   );
 }
 
-export async function getStaticProps(_context) {
-  const { title, sheet } = await getSpreadsheet();
+function buildGraphData(jsonTable) {
+  const xLabels = [
+    'Tarapacá',
+    'Antofagasta',
+    'Atacama',
+    'Coquimbo',
+    'Valparaíso',
+    "O'Higgins",
+    'Maule',
+    'Biobío',
+    'Araucanía',
+    'Los Lagos',
+    'Aysén',
+    'Magallanes y Antártica',
+    'RM',
+    'Los Ríos',
+    'Arica y Parinacota',
+    'Ñuble',
+  ];
+  const yLabels = jsonTable
+    .map((table) => Object.values(table)[0])
+    .slice(0, -1);
 
-  const rows = await sheet.getRows();
-  const data = rows.map((row) => ({
-    name: row['Nombre completo'],
-    email: row['Correo electrónico'],
-    occupation: row['Ocupación'],
-    reference: row['Cómo supiste de nosotros?'],
-    state: row['Estado asistencia'],
+  const data = jsonTable.map((table) => Object.values(table).slice(1, -1));
+
+  const datasets = yLabels.map((label, i) => ({
+    label,
+    data: data[i],
+    borderWidth: 1,
   }));
 
-  const graphData = {
-    labels: LABELS,
-    datasets: [
-      {
-        label: CONFIRMED,
-        data: LABELS.map(
-          (label) =>
-            data.filter(
-              (row) =>
-                row.state.toLowerCase() === CONFIRMED.toLowerCase() &&
-                row.reference.toLowerCase() === label.toLowerCase()
-            ).length
-        ),
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
-      },
-      {
-        label: ABSENT,
-        data: LABELS.map(
-          (label) =>
-            data.filter(
-              (row) =>
-                row.state.toLowerCase() === ABSENT.toLowerCase() &&
-                row.reference.toLowerCase() === label.toLowerCase()
-            ).length
-        ),
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-      },
-    ],
-  };
-
   return {
-    props: {
-      title,
-      data: graphData,
-    },
+    labels: xLabels,
+    datasets,
   };
 }
 
-async function getSpreadsheet() {
-  const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID);
+function buildSubAreaContractData(jsonTable) {
+  const xLabels = ['Contrato Indefinido', 'NS/NR', 'Plazo Fijo'];
+  const yLabels = jsonTable
+    .map((table) => Object.values(table)[0])
+    .slice(0, -1);
 
-  await doc.useServiceAccountAuth({
-    client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    private_key: process.env.GOOGLE_PRIVATE_KEY,
-  });
+  const data = jsonTable.map((table) => Object.values(table).slice(1, -1));
 
-  await doc.loadInfo();
+  const datasets = yLabels.map((label, i) => ({
+    label,
+    data: data[i],
+    borderWidth: 1,
+  }));
 
-  const sheet = doc.sheetsById['0'];
+  return {
+    labels: xLabels,
+    datasets,
+  };
+}
 
-  return { title: doc.title, sheet };
+export async function getStaticProps(_context) {
+  const files = await fs.readdir('public');
+  const tableFiles = files.filter((file) => file.includes('.html'));
+  const htmlTables = [];
+
+  for (const file of tableFiles) {
+    const htmlTable = await fs.readFile(`public/${file}`, 'utf-8');
+    htmlTables.push({ filename: file, htmlContent: htmlTable });
+  }
+  console.log(tableFiles);
+
+  const jsonTable = HtmlTableToJson.parse(htmlTables[2].htmlContent);
+  const jsonTableSubAreaContract = HtmlTableToJson.parse(
+    htmlTables[3].htmlContent
+  );
+
+  const graphData = buildGraphData(jsonTable.results.flat());
+  const subAreaContractData = buildSubAreaContractData(
+    jsonTableSubAreaContract.results.flat()
+  );
+
+  return {
+    props: {
+      title: 'Análisis Sector Ciencias',
+      data: [graphData, subAreaContractData],
+    },
+  };
 }
